@@ -11,8 +11,6 @@ face_cascade=cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 video=cv2.VideoCapture(0) # if more than 1 camera is accessable increment the parameter until desired camera is obtained
 
 first_frame = True
-
-count = 1
 fr = 1
 start = time.time()
 while True:
@@ -40,12 +38,14 @@ while True:
 
     # checks to see if a face has entered/exited the frame
     if status_list[-1] == 1 and status_list[-2] == 0:
-        current_time = datetime.now()
-        cv2.imwrite("Intruder_Photos/" + str(count) + ".jpeg", frame)
-        count+=1
+        times.append(datetime.now())
+        current_time = str(datetime.now())
+        current_time = current_time.replace(".", "_")
+        current_time = current_time.replace(" ", "_")
+        current_time = current_time.replace(":", "_")
+        cv2.imwrite("Intruder_Photos/" + current_time + ".jpeg", frame)
     if status_list[-1] == 0 and status_list[-2] == 1:
         times.append(datetime.now())
-    print(status)
 
     #displays current frame
     cv2.imshow("Capturing", frame)

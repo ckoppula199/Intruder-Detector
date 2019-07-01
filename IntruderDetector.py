@@ -5,6 +5,8 @@ face_cascade=cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 # starts taking data from camera
 video=cv2.VideoCapture(0) # if more than 1 camera is accessable increment the parameter until desired camera is obtained
 
+fr = 1
+start = time.time()
 while True:
     # reads current frame from camera
     check, frame = video.read()
@@ -28,7 +30,13 @@ while True:
     key = cv2.waitKey(1)
     if key == ord('q'):
         break
+end = time.time()
 
+# calculates framerate
+time_taken = end - start
+minutes = time_taken / 60
+frame_rate = fr/minutes/60
+print("Framerate was " + str(frame_rate) + " frames per second")
 
 video.release()
 cv2.destroyAllWindows()

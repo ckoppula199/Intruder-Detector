@@ -10,11 +10,19 @@ while True:
     check, frame = video.read()
 
     #obtain a grey version of the frame as it gives a higher accuracy
-    grey = cv2.cvtColor(frame, cv2.BGR2GRAY)
+    grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+
+    # creates a list of co-ordinates and widhts and heights of faces seen in the image
+    faces=face_cascade.detectMultiScale(grey,
+    scaleFactor=1.05,
+    minNeighbors=5)
+    # adds a rectangle around the face to highlight that face was detected
+    for x, y, width, height in faces:
+        frame=cv2.rectangle(frame, (x,y), (x+width, y+height), (0, 255, 0), 2)
 
     #displays current frame
     cv2.imshow("Capturing", frame)
-    cv2.imshow("Grey", grey)
+    #cv2.imshow("Grey", grey)
 
     # if q is pressed then exit the loop and end the program
     key = cv2.waitKey(1)

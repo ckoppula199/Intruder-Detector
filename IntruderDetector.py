@@ -12,6 +12,7 @@ video=cv2.VideoCapture(0) # if more than 1 camera is accessable increment the pa
 
 first_frame = True
 
+count = 1
 fr = 1
 start = time.time()
 while True:
@@ -35,15 +36,16 @@ while True:
         status = 1
     first_frame = False
 
-
     status_list.append(status)
-    print(status)
 
     # checks to see if a face has entered/exited the frame
     if status_list[-1] == 1 and status_list[-2] == 0:
-        times.append(datetime.now())
+        current_time = datetime.now()
+        cv2.imwrite("Intruder_Photos/" + str(count) + ".jpeg", frame)
+        count+=1
     if status_list[-1] == 0 and status_list[-2] == 1:
         times.append(datetime.now())
+    print(status)
 
     #displays current frame
     cv2.imshow("Capturing", frame)
@@ -65,8 +67,6 @@ print("Framerate was " + str(frame_rate) + " frames per second")
 
 # converts the data to a csv file that can be viewed in excel
 for i in range(0, len(times), 2):
-    print(i, times[i])
-    print(i+1, times[i+1])
     dataframe = dataframe.append({"Face entered frame": times[i], "Face exited frame": times[i+1]}, ignore_index=True)
 dataframe.to_csv("Times.csv")
 

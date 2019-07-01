@@ -10,6 +10,8 @@ face_cascade=cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
 # starts taking data from camera
 video=cv2.VideoCapture(0) # if more than 1 camera is accessable increment the parameter until desired camera is obtained
 
+first_frame = True
+
 fr = 1
 start = time.time()
 while True:
@@ -27,9 +29,15 @@ while True:
     # adds a rectangle around the face to highlight that face was detected
     for x, y, width, height in faces:
         frame=cv2.rectangle(frame, (x,y), (x+width, y+height), (0, 255, 0), 2)
+        if first_frame:
+            times.append(datetime.now())
+            print("first_frame")
         status = 1
+    first_frame = False
+
 
     status_list.append(status)
+    print(status)
 
     # checks to see if a face has entered/exited the frame
     if status_list[-1] == 1 and status_list[-2] == 0:
@@ -42,7 +50,6 @@ while True:
     #cv2.imshow("Grey", grey)
 
     # if q is pressed then exit the loop and end the program
-    print(status)
     key = cv2.waitKey(1)
     if key == ord('q'):
         if status == 1:
@@ -58,7 +65,9 @@ print("Framerate was " + str(frame_rate) + " frames per second")
 
 # converts the data to a csv file that can be viewed in excel
 for i in range(0, len(times), 2):
-    dataframe = dataframe.append({"Start": times[i], "End": times[i+1]}, ignore_index=True)
+    print(i, times[i])
+    print(i+1, times[i+1])
+    dataframe = dataframe.append({"Face entered frame": times[i], "Face exited frame": times[i+1]}, ignore_index=True)
 dataframe.to_csv("Times.csv")
 
 video.release()

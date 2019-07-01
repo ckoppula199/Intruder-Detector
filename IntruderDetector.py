@@ -1,4 +1,9 @@
-import cv2, time
+import cv2, time, pandas
+from datetime import datetime
+
+status_list = [None, None] # list requires 2 intitial values
+times = []
+dataframe = pandas.DataFrame(columns=["Face entered frame", "Face exited frame"])
 
 # contains the data regarding recognising a face front on
 face_cascade=cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
@@ -10,6 +15,7 @@ start = time.time()
 while True:
     # reads current frame from camera
     check, frame = video.read()
+    status = 0
 
     #obtain a grey version of the frame as it gives a higher accuracy
     grey = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
@@ -21,14 +27,26 @@ while True:
     # adds a rectangle around the face to highlight that face was detected
     for x, y, width, height in faces:
         frame=cv2.rectangle(frame, (x,y), (x+width, y+height), (0, 255, 0), 2)
+        status = 1
+
+    status_list.append(status)
+
+    # checks to see if a face has entered/exited the frame
+    if status_list[-1] == 1 and status_list[-2] == 0:
+        times.append(datetime.now())
+    if status_list[-1] == 0 and status_list[-2] == 1:
+        times.append(datetime.now())
 
     #displays current frame
     cv2.imshow("Capturing", frame)
     #cv2.imshow("Grey", grey)
 
     # if q is pressed then exit the loop and end the program
+    print(status)
     key = cv2.waitKey(1)
     if key == ord('q'):
+        if status == 1:
+            times.append(datetime.now())
         break
 end = time.time()
 
@@ -37,6 +55,11 @@ time_taken = end - start
 minutes = time_taken / 60
 frame_rate = fr/minutes/60
 print("Framerate was " + str(frame_rate) + " frames per second")
+
+# converts the data to a csv file that can be viewed in excel
+for i in range(0, len(times), 2):
+    dataframe = dataframe.append({"Start": times[i], "End": times[i+1]}, ignore_index=True)
+dataframe.to_csv("Times.csv")
 
 video.release()
 cv2.destroyAllWindows()

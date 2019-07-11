@@ -5,15 +5,19 @@ status_list = [None, None] # list requires 2 intitial values
 times = []
 dataframe = pandas.DataFrame(columns=["Face entered frame", "Face exited frame"])
 
-# contains the data regarding recognising a face front on
+# contains the data regarding recognising a face, front on
 face_cascade=cv2.CascadeClassifier("haarcascade_frontalface_default.xml")
+
 # starts taking data from camera
 video=cv2.VideoCapture(0) # if more than 1 camera is accessable increment the parameter until desired camera is obtained
 
 first_frame = True
-fr = 1
+fr = 0
 start = time.time()
 while True:
+    #increment frame rate counter
+    fr+=1
+
     # reads current frame from camera
     check, frame = video.read()
     status = 0
@@ -25,6 +29,7 @@ while True:
     faces=face_cascade.detectMultiScale(grey,
     scaleFactor=1.05,
     minNeighbors=5)
+
     # adds a rectangle around the face to highlight that face was detected
     for x, y, width, height in faces:
         frame=cv2.rectangle(frame, (x,y), (x+width, y+height), (0, 255, 0), 2)
@@ -36,10 +41,14 @@ while True:
 
     status_list.append(status)
 
+    #only need the last two values so shortens list to save memory
+    status_list = status_list[-2:]
+
     # checks to see if a face has entered/exited the frame
     if status_list[-1] == 1 and status_list[-2] == 0:
         times.append(datetime.now())
         current_time = str(datetime.now())
+        #replace certian chars to conform to image file name rules
         current_time = current_time.replace(".", "_")
         current_time = current_time.replace(" ", "_")
         current_time = current_time.replace(":", "_")
@@ -58,6 +67,7 @@ while True:
             times.append(datetime.now())
         break
 end = time.time()
+
 
 # calculates framerate
 time_taken = end - start
